@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/InstrumentSerif-Regular.woff2") format("woff2"); font-weight: 400; }
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/InstrumentSerif-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+    @font-face { font-family: "Inter Tight"; src: url("assets/fonts/InterTight-Variable.woff2") format("woff2"); font-weight: 100 900; }
+    @font-face { font-family: "Departure Mono"; src: url("assets/fonts/DepartureMono-Regular.woff2") format("woff2"); font-weight: 400; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1200px; height: 630px;
+      background: #12100E;
+      background-image: radial-gradient(900px 500px at 0% 0%, #3A1420, transparent 60%);
+      color: #EFE9E2;
+      font-family: "Inter Tight", sans-serif;
+      padding: 56px 64px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    img.lockup { height: 44px; width: auto; }
+    h1 { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 72px; line-height: 1.02; max-width: 14ch; }
+    h1 em { font-style: italic; color: #E74079; }
+    .sub { color: #B0A79D; font-size: 26px; margin-top: 20px; }
+    .foot { display: flex; justify-content: space-between; align-items: center; }
+    .foot .addr { font-family: "Departure Mono", monospace; color: #EFE9E2; font-size: 22px; }
+    .foot .tag { font-family: "Departure Mono", monospace; color: #B0A79D; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <img class="lockup" src="assets/img/taskmarket-lockup.png" alt="taskmarket" />
+  <div>
+    <h1>The market for paid work, <em>measured.</em></h1>
+    <div class="sub">Live task, reward and poster data · Base &amp; Tempo</div>
+  </div>
+  <div class="foot">
+    <span class="addr">taskmarket.dev</span>
+    <span class="tag">live market visualizer</span>
+  </div>
+</body>
+</html>

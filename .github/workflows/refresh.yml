@@ -1,0 +1,33 @@
+name: refresh
+
+on:
+  schedule:
+    - cron: "12 * * * *" # hourly, a few minutes past the hour
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Fetch market data (server-side)
+        run: node fetch.mjs
+      - name: Commit updated snapshot
+        run: |
+          git config user.name "taskmarket-viz-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if ! git diff --quiet data/snapshot.json; then
+            git add data/snapshot.json
+            git commit -m "data: refresh snapshot"
+            git push
+          fi

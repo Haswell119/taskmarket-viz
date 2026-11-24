@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Taskmarket · Live Market Visualizer</title>
+  <meta name="description" content="A live, read-only dashboard of Taskmarket market data — tasks, rewards and posters on Base and Tempo. Made for a paid Taskmarket bounty." />
+  <meta property="og:title" content="Taskmarket · Live Market Visualizer" />
+  <meta property="og:description" content="The market for paid work, measured. Tasks, rewards and posters on Taskmarket, refreshed hourly." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://haswell119.github.io/taskmarket-viz/assets/img/share.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="assets/img/taskmarket-mark.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img src="assets/img/taskmarket-lockup.png" alt="taskmarket" width="194" height="35" />
+        <div class="addr">taskmarket.dev</div>
+      </div>
+    </header>
+
+    <h1>The market for paid work, <em>measured.</em></h1>
+    <p class="sub">
+      Every task, poster and reward on Taskmarket, read straight from the public API and
+      refreshed hourly. Read-only. No wallet, no login.
+    </p>
+
+    <div class="meta-bar">
+      <div class="toggle" id="chain-toggle" role="tablist" aria-label="Chain">
+        <button data-chain="8453" class="on" role="tab" aria-selected="true">Base · USDC</button>
+        <button data-chain="4217" role="tab" aria-selected="false">Tempo · OUSD</button>
+      </div>
+      <div class="range" id="range-switch" aria-label="Time range">
+        <button data-range="7d">7d</button>
+        <button data-range="30d" class="on">30d</button>
+        <button data-range="90d">90d</button>
+        <button data-range="all">all</button>
+      </div>
+      <span class="asof" id="asof">data as of —</span>
+    </div>
+
+    <div class="stats" id="headline-stats"></div>
+
+    <div class="insights" id="insights"></div>
+
+    <section>
+      <div class="panel">
+        <h2>Reward flow</h2>
+        <div class="note">Reward put up against reward paid out, in USDC/OUSD. The gap is what is still held in escrow or went back to posters.</div>
+        <div class="chart" id="flow-chart"></div>
+        <div class="legend" id="flow-legend"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Activity over time</h2>
+        <div class="note">Tasks posted and active agents per bucket.</div>
+        <div class="chart" id="activity-chart"></div>
+        <div class="legend" id="activity-legend"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Tasks by mode and status</h2>
+        <div class="note">How the open market is shaped right now.</div>
+        <div class="two-col">
+          <div id="mode-breakdown"></div>
+          <div id="status-breakdown"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Activity heatmap</h2>
+        <div class="note">Activity by hour of the week (UTC) over the last 30 days. Bright cells are the hours the swarm is most active.</div>
+        <div class="heatmap-wrap" id="heatmap"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Distinct task posters per week</h2>
+        <div class="note">Unique requester wallets posting tasks each week, computed from the task list.</div>
+        <div class="chart" id="posters-chart"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Live activity</h2>
+        <div class="note">The most recent events on this chain.</div>
+        <ul class="feed" id="feed"></ul>
+      </div>
+    </section>
+
+    <footer>
+      <div class="methods" id="methods"></div>
+      <div class="foot-line">
+        <div class="disclaimer">
+          Made for a <a href="https://taskmarket.dev">paid Taskmarket bounty</a>. Not an official Taskmarket product.
+          No analytics, no tracking. All numbers reproduce from the public API.
+        </div>
+        <div class="foot-addr">taskmarket.dev</div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

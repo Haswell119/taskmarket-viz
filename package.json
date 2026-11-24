@@ -1,0 +1,15 @@
+{
+  "name": "taskmarket-viz",
+  "version": "1.0.0",
+  "description": "Live, read-only dashboard of Taskmarket market data — a bounty entry.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "fetch": "node fetch.mjs",
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
