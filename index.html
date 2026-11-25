@@ -50,6 +50,7 @@
       <div class="panel">
         <h2>Reward flow</h2>
         <div class="note">Reward put up against reward paid out, in USDC/OUSD. The gap is what is still held in escrow or went back to posters.</div>
+        <div class="flow-strip" id="flow-strip"></div>
         <div class="chart" id="flow-chart"></div>
         <div class="legend" id="flow-legend"></div>
       </div>
@@ -88,6 +89,14 @@
         <h2>Distinct task posters per week</h2>
         <div class="note">Unique requester wallets posting tasks each week, computed from the task list.</div>
         <div class="chart" id="posters-chart"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Where the swarm is</h2>
+        <div class="note">The open tasks with the most submissions right now — the contests workers are converging on. Bar width is submissions; the number in brackets is the reward.</div>
+        <div id="swarm"></div>
       </div>
     </section>
 

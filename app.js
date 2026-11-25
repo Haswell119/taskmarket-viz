@@ -35,6 +35,10 @@ const timeAgo = (iso) => {
   if (s < 86400) return Math.round(s / 3600) + "h ago";
   return Math.round(s / 86400) + "d ago";
 };
+const escapeHtml = (s) =>
+  String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
 
 /* ---------- tiny SVG chart helpers ---------- */
 function lineChart(el, buckets, series, opts = {}) {
@@ -213,6 +217,19 @@ function renderFlow() {
     { label: "reward put up", color: "var(--salmon)", type: "area", opacity: 0.28, line: false, value: (b) => usdcMicro(b.rewardVolume) },
     { label: "reward paid out", color: "var(--paper)", type: "line", width: 2, value: (b) => usdcMicro(b.paidVolume) },
   ], { tickFmt: (n) => fmtUsd(n) });
+
+  // Flow strip: the total put up in this window, and where it went.
+  const putUp = ts.reduce((a, b) => a + usdcMicro(b.rewardVolume), 0);
+  const paid = ts.reduce((a, b) => a + usdcMicro(b.paidVolume), 0);
+  const held = Math.max(0, putUp - paid);
+  const pct = putUp > 0 ? paid / putUp : 0;
+  document.getElementById("flow-strip").innerHTML = `
+    <div class="fnode in"><div class="flabel">posters put up</div><div class="fval">${fmtUsd(putUp)}</div></div>
+    <div class="farrow">→</div>
+    <div class="fnode mid"><div class="flabel">escrow</div><div class="fval">${fmtUsd(held)} still held</div></div>
+    <div class="farrow">→</div>
+    <div class="fnode out"><div class="flabel">paid to winners</div><div class="fval">${fmtUsd(paid)}</div></div>
+    <div class="fnote">${Math.round(pct * 100)}% of ${sym} put up in this window reached a winner; the rest is still in escrow or was refunded.</div>`;
 }
 
 function renderActivity() {
@@ -285,6 +302,25 @@ function renderPosters() {
   barChart(document.getElementById("posters-chart"), items);
 }
 
+function renderSwarm() {
+  const tc = chain().tasks.topContested || [];
+  const el = document.getElementById("swarm");
+  if (!tc.length) { el.innerHTML = `<p class="note">No open tasks with submissions in the sample.</p>`; return; }
+  const max = Math.max(1, ...tc.map((t) => t.submissionCount));
+  el.innerHTML = tc.map((t) => `
+    <div class="swarm-row">
+      <div class="swarm-head">
+        <span class="swarm-ref">${escapeHtml(t.ref)}</span>
+        <span class="swarm-title">${escapeHtml(t.title)}</span>
+        <span class="swarm-reward">${fmtUsd(t.reward)}</span>
+      </div>
+      <div class="swarm-bar">
+        <div class="swarm-fill" style="width:${Math.max(2, (t.submissionCount / max) * 100)}%"></div>
+        <span class="swarm-count">${fmtInt(t.submissionCount)} submissions · ${escapeHtml(t.mode)}</span>
+      </div>
+    </div>`).join("");
+}
+
 function renderFeed() {
   const items = (chain().feed && chain().feed.items) || [];
   const el = document.getElementById("feed");
@@ -332,6 +368,7 @@ function render() {
   renderBreakdowns();
   renderHeatmap();
   renderPosters();
+  renderSwarm();
   renderFeed();
   renderMethods();
 }

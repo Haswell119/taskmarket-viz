@@ -131,12 +131,27 @@ async function fetchTasks(id) {
   const topPosterShare = totalReq && sorted.length ? sorted[0][1] / totalReq : null;
   const distinctPosters = sorted.length;
 
+  // Most-contested open tasks: where the swarm is converging right now.
+  const topContested = tasks
+    .filter((t) => t.status === "open" && (t.submissionCount || 0) > 0)
+    .sort((a, b) => (b.submissionCount || 0) - (a.submissionCount || 0))
+    .slice(0, 8)
+    .map((t) => ({
+      ref: t.referenceCode,
+      title: (t.title || t.referenceCode || "").slice(0, 70),
+      reward: usdc(t.reward),
+      submissionCount: t.submissionCount,
+      mode: t.mode,
+      requester: t.requester,
+    }));
+
   return {
     taskCount: tasks.length,
     distinctPosters,
     topPosterShare,
     topPosterTasks: sorted.length ? sorted[0][1] : 0,
     postersByWeek,
+    topContested,
     recentTasks: tasks.slice(0, 20).map((t) => ({
       title: (t.title || t.referenceCode || "").slice(0, 90),
       ref: t.referenceCode,
