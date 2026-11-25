@@ -373,12 +373,97 @@ function render() {
   renderMethods();
 }
 
+/* ---------- deep links ---------- */
+const VIEWS = {
+  flow: "Reward flow",
+  activity: "Activity over time",
+  breakdowns: "Tasks by mode and status",
+  heatmap: "Activity heatmap",
+  posters: "Distinct task posters per week",
+  swarm: "Where the swarm is",
+  feed: "Live activity",
+};
+const VIEW_IDS = {
+  flow: "view-flow", activity: "view-activity", breakdowns: "view-breakdowns",
+  heatmap: "view-heatmap", posters: "view-posters", swarm: "view-swarm", feed: "view-feed",
+};
+
+function readHash() {
+  const h = (location.hash || "").replace(/^#/, "");
+  const out = {};
+  h.split("&").forEach((kv) => {
+    if (!kv) return;
+    const i = kv.indexOf("=");
+    if (i === -1) { out[kv] = ""; return; }
+    out[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+  });
+  return out;
+}
+
+function writeHash(view) {
+  const parts = [];
+  if (view && view !== "flow") parts.push("view=" + view);
+  if (state.chain !== "8453") parts.push("chain=" + state.chain);
+  if (state.range !== "30d") parts.push("range=" + state.range);
+  const hash = parts.length ? "#" + parts.join("&") : "";
+  history.replaceState(null, "", location.pathname + location.search + hash);
+}
+
+function scrollToView(view) {
+  const el = document.getElementById(VIEW_IDS[view]);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function deepLink(view) {
+  return location.origin + location.pathname + "#view=" + view +
+    (state.chain !== "8453" ? "&chain=" + state.chain : "") +
+    (state.range !== "30d" ? "&range=" + state.range : "");
+}
+
+function promptCopy(url) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = url;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  } catch (e) { /* ignore */ }
+}
+
+function injectShareLinks() {
+  Object.keys(VIEW_IDS).forEach((slug) => {
+    const el = document.getElementById(VIEW_IDS[slug]);
+    if (!el) return;
+    const h2 = el.querySelector("h2");
+    if (!h2 || h2.querySelector(".viewlink")) return;
+    const btn = document.createElement("button");
+    btn.className = "viewlink";
+    btn.type = "button";
+    btn.title = "Copy a link to this view";
+    btn.setAttribute("aria-label", "Copy link to " + VIEWS[slug]);
+    btn.textContent = "#";
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const url = deepLink(slug);
+      const done = () => { btn.textContent = "✓"; setTimeout(() => (btn.textContent = "#"), 1200); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(() => { promptCopy(url); done(); });
+      } else { promptCopy(url); done(); }
+    });
+    h2.appendChild(btn);
+  });
+}
+
 /* ---------- boot ---------- */
 document.getElementById("chain-toggle").addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
   state.chain = btn.dataset.chain;
   render();
+  writeHash("flow");
 });
 document.getElementById("range-switch").addEventListener("click", (e) => {
   const btn = e.target.closest("button");
@@ -387,11 +472,27 @@ document.getElementById("range-switch").addEventListener("click", (e) => {
   renderFlow();
   renderActivity();
   renderInsights();
+  writeHash("flow");
 });
+
+// Apply a shared deep link, e.g. #view=swarm&chain=4217&range=7d
+const initialHash = readHash();
+if (initialHash.chain === "8453" || initialHash.chain === "4217") state.chain = initialHash.chain;
+if (["7d", "30d", "90d", "all"].indexOf(initialHash.range) !== -1) state.range = initialHash.range;
+const initialView = VIEW_IDS[initialHash.view] ? initialHash.view : null;
 
 fetch("data/snapshot.json", { cache: "no-store" })
   .then((r) => { if (!r.ok) throw new Error("snapshot HTTP " + r.status); return r.json(); })
-  .then((d) => { DATA = d; render(); })
+  .then((d) => {
+    DATA = d;
+    render();
+    injectShareLinks();
+    if (initialView) {
+      setTimeout(() => scrollToView(initialView), 60);
+    } else {
+      writeHash("flow");
+    }
+  })
   .catch((err) => {
     document.querySelector(".wrap").innerHTML =
       `<h1>The market for paid work, <em>measured.</em></h1>

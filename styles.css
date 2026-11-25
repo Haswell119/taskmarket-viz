@@ -141,6 +141,20 @@ section { margin-top: 26px; }
   font-size: 24px;
   margin-bottom: 4px;
 }
+.panel h2 .viewlink {
+  margin-left: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  vertical-align: middle;
+}
+.panel h2 .viewlink:hover { color: var(--paper); border-color: var(--muted); }
 .panel .note { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 
 /* ---------- charts ---------- */
